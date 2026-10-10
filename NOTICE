@@ -1,0 +1,11 @@
+omni-render
+Copyright 2026 Juan Carlos De Santiago
+
+The renderer is licensed MIT OR Apache-2.0 (LICENSE-MIT, LICENSE-APACHE). The doctor and T25 core files are licensed
+PolyForm Small Business 1.0.0 OR PolyForm Noncommercial 1.0.0 (LICENSE.md, LICENSE-NONCOMMERCIAL.md); LICENSING.md lists which.
+
+This product includes software developed by third parties, used under their own licences:
+  - Unicode data tables (Unicode License v3), used by omni-spec for line breaking: Copyright (c) Unicode, Inc.
+  - webpki-roots (CDLA-Permissive-2.0): the root certificate data it embeds is Mozilla's.
+  - Rust crates linked at build time keep their own licences (MIT, Apache-2.0, BSD-2/3, ISC, Zlib, 0BSD, Unlicense; `ring` is
+    Apache-2.0 AND ISC); `cargo metadata` lists them. No copyleft crate is linked.

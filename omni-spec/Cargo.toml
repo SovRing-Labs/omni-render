@@ -1,0 +1,11 @@
+[package]
+name = "omni-spec"
+version = "0.1.0"
+edition = "2024"
+description = "Our own implementations of published standards, built from the specifications only (the modules omni-render uses)."
+license = "Apache-2.0"
+
+[dependencies]
+
+[profile.test]
+opt-level = 3

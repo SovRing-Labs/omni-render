@@ -1,0 +1,14 @@
+<!doctype html><html><head><title>JS-0 test</title><style>.ready h1{color:#0a5} .item{font-weight:bold}</style></head><body>
+<h1 id=h>Before scripts</h1>
+<button id=b onclick="var m=document.getElementById('more'); m.hidden = !m.hidden; return false">Toggle</button>
+<p id=more hidden>Hidden text revealed by onclick</p>
+<ul id=list></ul>
+<p><a id=nav href="/other.html">intercepted link</a> · <a id=plain href="/other.html">plain link</a></p>
+<script src="app.js"></script>
+<script>
+document.getElementById('h').textContent = 'After: ' + [1, 2, 3].map(x => x * 2).join(',');
+document.addEventListener('DOMContentLoaded', () => { document.body.classList.add('ready'); document.querySelector('.item').style.color = 'red'; });
+document.getElementById('nav').addEventListener('click', e => { e.preventDefault(); document.getElementById('h').textContent = 'Link intercepted by a listener'; });
+setTimeout(() => { const p = document.createElement('p'); p.id = 'late'; p.textContent = 'timer ran'; document.body.append(p); }, 50);
+fetch('data.json').then(r => r.json()).then(d => { const p = document.createElement('p'); p.textContent = 'fetched: ' + d.msg; document.body.appendChild(p); });
+</script></body></html>

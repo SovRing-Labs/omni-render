@@ -1,0 +1,30 @@
+[package]
+name = "omni-render"
+version = "0.1.0"
+edition = "2024"
+description = "A web rendering engine: packed DOM, integer layout, a JavaScript runtime on its own IR, and a self-repair core"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/SovRing-Labs/omni-render"
+
+[dependencies]
+brotli-decompressor = "6.0.1"
+gif = "0.14.2"
+html5ever = "0.39"
+image-webp = "0.2.4"
+libc = "0.2.190"
+markup5ever_rcdom = "0.39.0"
+memmap2 = "0.9.11"
+miniz_oxide = "0.9.1"
+png = "0.18.1"
+omni-spec = { path = "omni-spec" } # our clean-room standards library (UAX #14 line breaking, OpenType kerning), Apache-2.0
+ring = "0.17.14"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+serde_json = "1.0.151"
+ttf-parser = "0.25.1"
+webpki-roots = "1"
+zune-jpeg = "0.5.15"
+wasmtime = { version = "49", default-features = false, features = ["cranelift", "runtime", "std"] }
+
+[features]
+default = []
+t25 = [] # PolyForm side: the T25 core + doctor (see LICENSING.md)

@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "omni-render: a web rendering engine with a packed DOM, integer layout and a program runtime"
+version: 0.1.0
+abstract: "A web rendering engine for the computers people already own: packed DOM (16 B/node), own CSS engine, integer fixed-point layout, 2-bit glyph masks, a JavaScript runtime on its own IR, and a self-repair (doctor) core. Published as prior art."
+authors:
+  - family-names: "De Santiago"
+    given-names: "Juan Carlos"
+license: ["MIT OR Apache-2.0", "PolyForm-Small-Business-1.0.0", "PolyForm-Noncommercial-1.0.0"]
+repository-code: "https://github.com/SovRing-Labs/omni-render"
+keywords: [web rendering, layout engine, accessibility, ternary, prior art]

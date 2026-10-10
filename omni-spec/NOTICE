@@ -1,0 +1,9 @@
+omni-spec — standards-built library
+Copyright 2026 Juan Carlos De Santiago, with the Sovereign Raptor fleet (AI-assisted)
+
+This product includes data derived from the Unicode Character Database and Unicode Standard Annexes
+(e.g. LineBreak.txt, GraphemeBreakProperty.txt, emoji-data.txt and their conformance test files).
+Copyright © 1991-2026 Unicode, Inc. Distributed under the Unicode License v3 (https://www.unicode.org/license.txt).
+
+Modules are implemented from published specifications (Unicode Standard Annexes, the OpenType specification, IETF RFCs,
+W3C Recommendations, the Open Group Base Specifications). No third-party source code was read or copied.
