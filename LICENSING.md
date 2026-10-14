@@ -14,3 +14,10 @@ no-op stand-in `src/jit/t25_stub.rs` (MIT OR Apache-2.0) and none of the PolyFor
 Small Business and Noncommercial terms are those of polyformproject.org; for other terms, contact the author.
 
 Published as dated prior art: the authors claim no patent and ask that none be granted on what is disclosed.
+
+## Evaluation and commercial use (added 2026-10-14)
+- **Evaluate first, free:** any organisation, of any size, may evaluate this repository's PolyForm-licensed files (the doctor and the T25 core; everything else is MIT OR Apache-2.0) under the **PolyForm Free Trial License 1.0.0**
+  (`LICENSE-FREE-TRIAL.md`) for less than 32 consecutive calendar days.
+- **Commercial licence:** use beyond the free licences (a larger company using it for a commercial purpose after evaluation) is
+  available under a separate, paid commercial licence agreement with the licensor named in the Required Notice. To start one,
+  open an issue in this repository titled "Commercial licence".
