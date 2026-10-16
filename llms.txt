@@ -1,8 +1,9 @@
 # omni-render
 
-> A web rendering engine for the computers people already own: speed across the whole experience, small memory, safety and privacy.
+> Our own web rendering engine in Rust: packed DOM, own CSS engine, integer layout, 2-bit raster, a program runtime that emits x86, a JavaScript interpreter on its own IR, and a self-repair core for layout.
 
 Setup: `git clone --depth 1 https://github.com/SovRing-Labs/omni-render && cd omni-render && cargo test --release` (expect: test result: ok).
+Status: pre-alpha, under development — read STATUS.md before relying on a number.
 Licence: MIT OR Apache-2.0 (renderer); doctor and T25 core PolyForm Small Business OR Noncommercial.
 
 ## Docs

@@ -1,0 +1,307 @@
+{
+  "_about": {
+    "repo": "omni-render",
+    "url": "https://github.com/SovRing-Labs/omni-render",
+    "one_line": "Our own web rendering engine in Rust: packed DOM, own CSS engine, integer layout, 2-bit raster, a program runtime that emits x86, a JavaScript interpreter on its own IR, and a self-repair core for layout.",
+    "quicktest": "for f in tests/re/*.js; do node \"$f\" >/dev/null || exit 1; done; echo ok",
+    "quicktest_s": 2,
+    "licence": "MIT OR Apache-2.0 for the renderer; PolyForm Small Business 1.0.0 OR PolyForm Noncommercial 1.0.0 for the doctor and T25 core (cargo feature t25, off by default; PolyForm Free Trial for evaluation); text CC BY 4.0 (LICENSING.md). Quicktest runs the node reference cases only; the engine's own tests need a cargo build (R13).",
+    "status_file": "STATUS.md",
+    "generated": "2026-10-16",
+    "schema": 1,
+    "source": "README.md, DOSSIER.md, TECHNICAL-DISCLOSURE.md (Part 6), LICENSING.md, tests/js-compile-0/INDEX.md, tests/re/*.js, tools/re_parity.py, src unit tests"
+  },
+  "tests": [
+    {
+      "id": "R1",
+      "title": "Layout agrees with Chrome on 85.7 % of boxes (49 frozen pages)",
+      "claim": "Boxes agreeing with Chrome (49 pages): 24,004 of 28,010 (85.7 %); agreement over the gate series 19,008 -> 24,004 of 28,010 boxes, 0 lost at every merge",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('DOSSIER.md',encoding='utf-8').read().split());f=[\\\"24,004 of 28,010 (85.7 %)\\\", \\\"19,008 → 24,004 of 28,010 boxes, 0 lost at every merge\\\", \\\"within max(2 px, 5 %)\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('24,004 of 28,010 (85.7 %)')\"",
+      "expect": "24,004 of 28,010 (85.7 %)",
+      "evidence": [
+        "DOSSIER.md"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "On a frozen corpus of 49 public pages whose Chrome DOMSnapshot was captured, a box counts as agreeing when its x, y, width and height are each within max(2 px, 5 %) of Chrome's. 24,004 of the 28,010 comparable boxes agree (85.7 %). This check only confirms the committed record says so; it does not re-render the pages. Passing the real measurement would show our integer layout lands near Chrome's geometry on those pages, not that any page looks identical or that unseen pages behave the same.",
+      "how_we_got_it": "Related tools in the repo: tools/fetch_corpus.py freezes a page corpus (system Chrome via Playwright, JavaScript off) and tools/perpage.py reads per-page layout agreement from a render log; the comparison run itself is not committed. Machine: i5-8365U laptop (TECHNICAL-DISCLOSURE.md header). The Dossier records the series 10-07 to 10-08 ('agreement with Chrome 19,008 -> 24,004 of 28,010 boxes, 0 lost at every merge'). The captured corpus and per-run result files are not in the repo; the number is the dossier's record. The Technical Disclosure reports an earlier point in the same series (17,391 / 28,010 at run 35).",
+      "use_in_your_work": "A concrete yardstick for 'does my engine lay pages out like Chrome': per-box tolerance max(2 px, 5 %) is easy to copy for any layout engine you build or patch, and the 'merge only if 0 boxes lost' rule is a reusable regression gate.",
+      "honest_limits": "Not independently reproducible from the repo alone: the frozen 49-page corpus and the result files are not published here. 14.3 % of boxes still disagree; Chrome is the only judge, so where Chrome itself draws a defect the engine is scored against that defect (Dossier Limits: 'Pristine fixes move boxes away from Chrome where Chrome draws the same defect').",
+      "corrections": []
+    },
+    {
+      "id": "R2",
+      "title": "99.0 % of computed CSS values equal Chrome's",
+      "claim": "own cascade: 1,110,636 of 1,121,947 computed values equal Chrome (99.0%); glyphs as 2-bit masks, mean SSIM 0.815 (viewport) / 0.763 (full)",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('TECHNICAL-DISCLOSURE.md',encoding='utf-8').read().split());f=[\\\"1,110,636 of 1,121,947 computed values equal Chrome (99.0%)\\\", \\\"mean SSIM 0.815 (viewport) / 0.763 (full)\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('1,110,636 of 1,121,947')\"",
+      "expect": "1,110,636 of 1,121,947",
+      "evidence": [
+        "TECHNICAL-DISCLOSURE.md"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "The engine's own CSS cascade (selectors, media queries, @supports, custom properties, calc/min/max/clamp) was compared with Chrome's computed styles on the same frozen pages: 1,110,636 of 1,121,947 values are equal, 99.0 %. Pixel similarity is reported separately and is lower: mean SSIM 0.815 for the viewport and 0.763 for the full page. Passing this file check shows the disclosure contains those numbers; it does not recompute them.",
+      "how_we_got_it": "TECHNICAL-DISCLOSURE.md Part 6 (2026-10-04): laptop i5-8365U (4 cores / 8 threads, AVX2, L3 6 MB), shared during most runs with a concurrent CPU training job (load 6-12), so wall times are noisy. The disclosure states that item-level run records are private and that a figure not naming a harness and result file is 'a figure recorded by the project, not an independently reproducible one'. Harness: the same 49-page frozen corpus with Chrome DOMSnapshot; related tools tools/fetch_corpus.py and tools/perpage.py. Result files are not committed in the repo.",
+      "use_in_your_work": "If you write a CSS engine or a style-aware tool, per-property equality against a real browser's computed style is a cheap, automatic oracle that needs no pixels; SSIM next to it shows how far value equality is from looking the same.",
+      "honest_limits": "Computed-value equality is not rendering equality: SSIM is 0.815 / 0.763, not near 1. The figure is a project record, not reproducible from the repo.",
+      "corrections": []
+    },
+    {
+      "id": "R3",
+      "title": "Agent mode: 28.5 pages/s at 36 MB",
+      "claim": "Agent mode: 28.5 pages/s at 36 MB (same harness: Lightpanda 23.3 @ 94 MB, Chrome 0.78 @ 551 MB)",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('TECHNICAL-DISCLOSURE.md',encoding='utf-8').read().split());f=[\\\"28.5 pages/s at 36 MB\\\", \\\"Lightpanda 23.3 @ 94 MB, Chrome 0.78 @ 551 MB\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('28.5 pages/s at 36 MB')\"",
+      "expect": "28.5 pages/s at 36 MB",
+      "evidence": [
+        "TECHNICAL-DISCLOSURE.md"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "In agent mode (no window, page in, structured result out) the engine processed 28.5 pages per second using 36 MB, measured with the same harness against Lightpanda (23.3 pages/s at 94 MB) and Chrome (0.78 pages/s at 551 MB). The check confirms the committed statement. It does not show the pages were rendered equally faithfully by the three programs, nor that script-heavy pages are this cheap.",
+      "how_we_got_it": "TECHNICAL-DISCLOSURE.md Part 6 (2026-10-04): laptop i5-8365U (4 cores / 8 threads, AVX2, L3 6 MB), shared during most runs with a concurrent CPU training job (load 6-12), so wall times are noisy. The disclosure states that item-level run records are private and that a figure not naming a harness and result file is 'a figure recorded by the project, not an independently reproducible one'. Harness: tools/agent_bench.py (omni-render vs Lightpanda vs headless Chrome on the same replayed pages, each engine in its own cgroup so peak memory includes every process it spawned). Its output file is not committed.",
+      "use_in_your_work": "Sizing a fleet of headless page readers (scrapers, agents, test crawlers): pages per second per megabyte is the number that decides how many fit on a small machine. You can run tools/agent_bench.py against your own page set with a built binary to get your own figure.",
+      "honest_limits": "Document-style pages only. The omni-ui dossier records that script-heavy pages are not light (up to 2.23 GB on a video site). Competitor versions and the machine state during the comparison are not recorded.",
+      "corrections": []
+    },
+    {
+      "id": "R4",
+      "title": "Sandbox: 5/5 escape probes denied; fuzzer 0 findings",
+      "claim": "Landlock + seccomp sandbox 5/5 escape probes denied; fuzzer 242k executions, 0 findings after fixes; TLS via rustls refuses badssl expired / self-signed / wrong-host / untrusted-root",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('TECHNICAL-DISCLOSURE.md',encoding='utf-8').read().split());f=[\\\"5/5 escape probes denied\\\", \\\"242k executions, 0 findings after fixes\\\", \\\"badssl expired / self-signed / wrong-host / untrusted-root refused\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('5/5 escape probes denied; 242k executions')\"",
+      "expect": "5/5 escape probes denied; 242k executions",
+      "evidence": [
+        "TECHNICAL-DISCLOSURE.md"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "The page-processing sandbox (Landlock plus seccomp) denied all five escape attempts that were tried, a fuzzer ran 242 thousand executions with no remaining findings once earlier ones were fixed, and four badssl.com bad-certificate cases were refused. Passing confirms the record only. Five probes and 242k executions are small samples: this is evidence the basic walls hold, not a security audit.",
+      "how_we_got_it": "TECHNICAL-DISCLOSURE.md Part 6 (2026-10-04): laptop i5-8365U (4 cores / 8 threads, AVX2, L3 6 MB), shared during most runs with a concurrent CPU training job (load 6-12), so wall times are noisy. The disclosure states that item-level run records are private and that a figure not naming a harness and result file is 'a figure recorded by the project, not an independently reproducible one'. Fuzz harness: src/fuzz.rs; sandbox: src/sandbox.rs; no result logs are committed.",
+      "use_in_your_work": "A starting checklist for confining an untrusted-input process on Linux (Landlock filesystem rules, seccomp allow-list, escape probes as tests, certificate-failure cases).",
+      "honest_limits": "'0 findings after fixes' means findings existed before fixes (the disclosure does not list them here). No independent review is recorded. Linux only.",
+      "corrections": []
+    },
+    {
+      "id": "R5",
+      "title": "Own x86 emitter: 0 diffs vs objdump; ternary heads and sift twin 0 mismatches",
+      "claim": "every encoding checked against GNU objdump (0 diffs); ternary heads 0 mismatches on 16 trained matrices + random 4 KB-4 MB, 1.6-3.4x the packed-trit kernel while the code fits L3; sift twin rendered from IR 0/45 mismatches vs the hand AVX2 library, rendered in 30 us",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('TECHNICAL-DISCLOSURE.md',encoding='utf-8').read().split());f=[\\\"every encoding checked against GNU objdump (0 diffs)\\\", \\\"0 mismatches on 16 trained matrices\\\", \\\"1.6–3.4× the packed-trit kernel while the code fits L3\\\", \\\"0/45 mismatches vs the hand AVX2 library, rendered in 30 µs\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('0 diffs; 0/45 mismatches')\"",
+      "expect": "0 diffs; 0/45 mismatches",
+      "evidence": [
+        "TECHNICAL-DISCLOSURE.md",
+        "src/jit/x86.rs",
+        "src/jit/ternary.rs"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "The engine writes its own x86 machine code (about 35 instructions, VEX encodings) into executable pages at run time. Each encoding matched GNU objdump's disassembly (0 diffs). Ternary weight matrices were compiled into straight-line add/sub code (+1 add, -1 sub, 0 nothing) and agreed with the plain computation on 16 trained matrices and random sizes, and ran 1.6-3.4x faster than the packed-trit kernel while the code fits in L3. A second kernel (sift lookup) generated from IR matched the hand-written AVX2 version on all 45 cases. Passing confirms the record; the repo also carries the emitter's unit tests (see R13).",
+      "how_we_got_it": "TECHNICAL-DISCLOSURE.md Part 6 (2026-10-04): laptop i5-8365U (4 cores / 8 threads, AVX2, L3 6 MB), shared during most runs with a concurrent CPU training job (load 6-12), so wall times are noisy. The disclosure states that item-level run records are private and that a figure not naming a harness and result file is 'a figure recorded by the project, not an independently reproducible one'. Code: src/jit/x86.rs, src/jit/ternary.rs (each with a #[test]). Machine has AVX2. The objdump comparison and 16 trained matrices are not committed.",
+      "use_in_your_work": "Generating specialised CPU code from a model's fixed weights (zero weights cost nothing) is a technique you can copy for small-model inference on CPUs; objdump as an oracle for your own emitter is a cheap check anyone can reproduce.",
+      "honest_limits": "Speedup is stated only 'while the code fits L3'; the in-loop head cost is open (52-65 us in the loop vs 18.5 us hot because 0.9 MB of code exceeds L2). x86-64 with AVX2 only.",
+      "corrections": []
+    },
+    {
+      "id": "R6",
+      "title": "Disclosed correction: the 2.76x faster claim was against the wrong baseline",
+      "claim": "the IR v0 tiled schedule was first reported 2.76x faster than the hand kernel - the baseline was the untiled kernel; against the hand register-blocked kernel it is 1.4-2.5x SLOWER (corrected record)",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('TECHNICAL-DISCLOSURE.md',encoding='utf-8').read().split());f=[\\\"Disclosed failure:\\\", \\\"2.76× faster than the hand kernel\\\", \\\"1.4–2.5× SLOWER (corrected record)\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('2.76x retracted; 1.4-2.5x slower')\"",
+      "expect": "2.76x retracted; 1.4-2.5x slower",
+      "evidence": [
+        "TECHNICAL-DISCLOSURE.md"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "A negative result kept on purpose. A schedule generated from the engine's IR was first reported as 2.76x faster than the hand kernel, but the baseline it was compared against was the untiled kernel. Against the proper hand register-blocked kernel it is 1.4-2.5x slower. Passing confirms the correction is in the record next to the retracted claim.",
+      "how_we_got_it": "Recorded in TECHNICAL-DISCLOSURE.md section 2 as a 'Disclosed failure'; the original and corrected measurements are not committed as separate result files.",
+      "use_in_your_work": "A model for your own benchmark reports: say which baseline a speedup was measured against, and keep the retraction beside the claim.",
+      "honest_limits": "Only the corrected outcome is stated; no harness output for either measurement is in the repo.",
+      "corrections": []
+    },
+    {
+      "id": "R7",
+      "title": "JavaScript on our IR: 29/29 laws agree with node; fleet launcher 73.7 % box agreement; 9x slower than node",
+      "claim": "jsi verified as Omniglyph language omniir: 29/29 laws with a JS form agree with node; the fleet launcher (65 components, 968 KB of JS) 73.7% box agreement (2,150 / 2,918), SSIM 0.699, 0 script errors; microbench ~370 ms (node 40 ms) - 9x slower than node, disclosed",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('TECHNICAL-DISCLOSURE.md',encoding='utf-8').read().split());f=[\\\"29/29 laws with a JS form agree with node\\\", \\\"73.7% box agreement (2,150 / 2,918)\\\", \\\"SSIM 0.699, 0 script errors\\\", \\\"~370 ms (node 40 ms)\\\", \\\"9× slower than node, disclosed\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('29/29 laws; 2,150 / 2,918; 9x slower')\"",
+      "expect": "29/29 laws; 2,150 / 2,918; 9x slower",
+      "evidence": [
+        "TECHNICAL-DISCLOSURE.md"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "The engine's own JavaScript interpreter (closures, classes, async, modules, own regex engine) agreed with node on all 29 laws that have a JS form. A real 65-component Svelte app (968 KB of JS), translated to the engine's IR at build time, rendered with 73.7 % of boxes agreeing with Chrome with JS on (2,150 of 2,918), up from 22.2 % then 57.3 %. The same record states the speed gap plainly: a microbench takes about 370 ms against node's 40 ms, 9x slower. Passing confirms the record.",
+      "how_we_got_it": "TECHNICAL-DISCLOSURE.md Part 6 (2026-10-04): laptop i5-8365U (4 cores / 8 threads, AVX2, L3 6 MB), shared during most runs with a concurrent CPU training job (load 6-12), so wall times are noisy. The disclosure states that item-level run records are private and that a figure not naming a harness and result file is 'a figure recorded by the project, not an independently reproducible one'. The 29 laws are part of the Omniglyph law set (not in this repo); the Svelte translator is tools/svelte2ir.mjs and the JS front end tools/js2ir.mjs. Compared against Chrome with JS on. Result files are not committed.",
+      "use_in_your_work": "If you embed a small interpreter, node as a differential oracle plus a full real application as the end-to-end test is a pattern you can reuse; the speed gap shows the budget to expect from a plain interpreter.",
+      "honest_limits": "Interpreter speed is 9x slower than node; 26.3 % of that app's boxes still disagree with Chrome. test262 conformance is reported as 54.5 % -> 56.85 % of executed tests (DOSSIER.md), i.e. a large part of the language suite still fails.",
+      "corrections": []
+    },
+    {
+      "id": "R8",
+      "title": "Honest negatives: what the self-repair core has not solved",
+      "claim": "Not yet: 43 of ~63 problems (~223 boxes) remain 'no knob moves these boxes'; DEBUG pairs: 0 solves so far; three fault-localisation probes failed their bars",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('TECHNICAL-DISCLOSURE.md',encoding='utf-8').read().split());f=[\\\"Not yet:\\\", \\\"43 of ~63 problems\\\", \\\"(≈ 223 boxes)\\\", \\\"DEBUG pairs: 0 solves so far\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('43 of ~63 problems')\" && python3 -c \"import sys;t=' '.join(open('DOSSIER.md',encoding='utf-8').read().split());f=[\\\"Three fault-localisation probes failed their bars\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('DEBUG 0 solves')\"",
+      "expect": "DEBUG 0 solves",
+      "evidence": [
+        "TECHNICAL-DISCLOSURE.md",
+        "DOSSIER.md"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "The self-repair ('doctor') core tries to fix the layout engine's own disagreements with Chrome by turning ternary knobs on layout terms. This row keeps what it could not do: 43 of about 63 problem classes (around 223 boxes) have no knob that moves the boxes; the debug-pair station has solved none so far; three fault-localisation probes failed their bars. Passing confirms the negatives are published.",
+      "how_we_got_it": "TECHNICAL-DISCLOSURE.md section 5 ('What has not borne fruit yet') and DOSSIER.md Limits. The run-by-run log behind the core is described as private and not published.",
+      "use_in_your_work": "A realistic picture of what automated repair of a layout engine achieved and where it stalls, so you do not plan on it solving table widths or flex item widths today.",
+      "honest_limits": "Counts are the project's own tally; the core's source (src/doctor*.rs, src/jit/t25.rs) is PolyForm-licensed and built only with --features t25.",
+      "corrections": []
+    },
+    {
+      "id": "R9",
+      "title": "Doctor: clean-room rebuild 27/32 functions, 256/256 seeded leaks refused, fix loop 565 -> 220 defects",
+      "claim": "Clean room on our own layout file: 27 of 32 functions rebuilt from the spec alone; 256/256 seeded leaks refused; unattended fix loop 565 -> 220 defects, 0 pristine boxes lost; T25 kernel inside layout 0.90 % of layout time",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('DOSSIER.md',encoding='utf-8').read().split());f=[\\\"27 of 32 functions rebuilt from the spec alone; 256/256 seeded leaks refused\\\", \\\"565 → 220 defects, 0 pristine boxes lost\\\", \\\"0.90 % of layout time\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('27 of 32; 256/256; 565 -> 220')\"",
+      "expect": "27 of 32; 256/256; 565 -> 220",
+      "evidence": [
+        "DOSSIER.md"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "In a two-team clean-room test, functions of the engine's own layout file were rebuilt from a written specification alone: 27 of 32 succeeded, and 256 of 256 deliberately seeded leaks (spec text that would let the implementer copy code) were refused. The unattended fix loop reduced pristine-geometry defects from 565 to 220 with no pristine boxes lost, and the generated T25 kernel costs 0.90 % of layout time. Passing confirms the dossier record.",
+      "how_we_got_it": "DOSSIER.md metrics and creation history (2026-10-07 and 10-08). Harness scripts are in tools/ (doctor_round.sh, doctor-transplant.py, t25_check.py); result logs are private and not in the repo.",
+      "use_in_your_work": "A worked example of testing a clean-room process with seeded leaks, and of a fix loop with a 'lose nothing that already agrees' gate.",
+      "honest_limits": "5 of 32 functions failed to rebuild; 220 defects remain; the fix loop moves some boxes away from Chrome where Chrome draws the same defect (Dossier Limits).",
+      "corrections": []
+    },
+    {
+      "id": "R10",
+      "title": "JS-compile gates: js_mod 0 mismatches / 20,000,441; probe 106/106; outputs equal node",
+      "claim": "js_mod exactness 0 mismatches / 20,000,441; SLOTCHECK benches 0 lines, probe 106/106; compiled == interpreted 60/60, probe 106/106 in all modes",
+      "kind": "file",
+      "verify": "python3 -c \"import sys;t=' '.join(open('tests/js-compile-0/INDEX.md',encoding='utf-8').read().split());f=[\\\"0 mismatches / 20,000,441\\\", \\\"0 lines, probe 106/106\\\", \\\"60/60, probe 106/106 in all modes\\\", \\\"23/25 bundles\\\"];m=[x for x in f if x not in t];sys.exit('MISSING: %s' % m) if m else print('0 mismatches / 20,000,441; 106/106')\"",
+      "expect": "0 mismatches / 20,000,441; 106/106",
+      "evidence": [
+        "tests/js-compile-0/INDEX.md"
+      ],
+      "runtime_s": 1,
+      "needs": [
+        "python3"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "The JS-COMPILE-0 test index records: the integer-modulo fast path equals the fmod path bit for bit across 20,000,441 random and edge inputs (-0, NaN, infinities, 2^53) with 0 mismatches; every slot read/write equals the by-name walk (0 mismatch lines) and a 106-check platform probe passes 106/106; compiled function bodies give the interpreter's results (60/60 laws, probe 106/106 in all modes). Also recorded: 23 of 25 recorded page bundles replayed with identical steps and DOM nodes on both runs, and benchmark speedups of 1.3-2.8x from the compiler. Passing confirms the index; tests/js-compile-0 holds the harnesses to re-run.",
+      "how_we_got_it": "tests/js-compile-0/INDEX.md (dated 2026-10-07): harnesses run.sh, ab.sh, pageab.py, yt.sh, corpus_js.sh, tools/modcheck.rs. Machine was shared with training runs, so the index compares user-CPU seconds of base vs new in one session. The results/*.tsv it points to are not in the repo.",
+      "use_in_your_work": "Copyable test pattern for a JIT: a bit-exactness check of every fast path against its slow path, a 'teeth' build that deliberately breaks the compiled code to prove the tests notice, and interleaved A/B timing that survives a loaded machine.",
+      "honest_limits": "The results/ tables the index cites are not committed; the YouTube timing is stated as 'NOT comparable' (live page work varied 3.1-6.1 M steps per run). Re-running needs a built binary.",
+      "corrections": []
+    },
+    {
+      "id": "R11",
+      "title": "Regex/String test cases run under node (reference side only)",
+      "claim": "tests/re: seven JavaScript cases (exec lastIndex, matchAll, match, search, Date, error surface) written once in plain JS, run under node as ground truth",
+      "kind": "run",
+      "verify": "for f in tests/re/*.js; do node \"$f\" >/dev/null || exit 1; done; echo \"ok $(ls tests/re/*.js | wc -l)\"",
+      "expect": "ok 7",
+      "evidence": [
+        "tests/re/exec-lastIndex.js",
+        "tests/re/matchAll.js",
+        "tests/re/match-test.js",
+        "tests/re/search.js",
+        "tests/re/date.js",
+        "tests/re/error-surface.js",
+        "tests/re/exec-nonGlobal.js"
+      ],
+      "runtime_s": 2,
+      "needs": [
+        "node >= 18"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "Runs the seven regular-expression and Date cases with node alone and checks each exits 0. This proves the cases themselves are valid JavaScript that node accepts, which is the reference half of the parity gate in R12. It does NOT test omni-render: the parity claim needs the engine's binary to run the same files and a byte-for-byte output comparison.",
+      "how_we_got_it": "tests/re/*.js are the cases; the gate that compares node with omni-render is tools/re_parity.py (R12). It was added after a logged bug where RegExp.prototype.exec behaved like String.match and a loop never terminated on a 1.59 MB transcript (docstring of tools/re_parity.py).",
+      "use_in_your_work": "Reuse the cases to check any JavaScript engine or regex implementation for exec/lastIndex and matchAll semantics: write each case once, run it against node and your engine, diff the output.",
+      "honest_limits": "Reference side only; no omni-render code runs in this test.",
+      "corrections": []
+    },
+    {
+      "id": "R12",
+      "title": "Regex/String parity gate: node vs omni-render output byte for byte",
+      "claim": "console.log output of every tests/re case must match byte for byte between node and the omni-render JS interpreter (exit 0 = parity)",
+      "kind": "external",
+      "verify": "python3 tools/re_parity.py",
+      "expect": "exit 0",
+      "evidence": [
+        "tools/re_parity.py",
+        "tests/re/match-test.js"
+      ],
+      "runtime_s": 600,
+      "needs": [
+        "cargo (Rust 1.8x, edition 2024)",
+        "node >= 18",
+        "acorn (npm package, for tools/js2ir.mjs)",
+        "a release build: cargo build --release"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "Each case is run by node (ground truth) and by omni-render after js2ir translation; any output difference is a failure. Passing proves the engine's regex and string surface agrees with node on those cases, including the exec/lastIndex cases that once looped forever. It does not prove full ECMAScript conformance (see R7 and the test262 figure).",
+      "how_we_got_it": "tools/re_parity.py with tests/re/*.js and tests/re/engine-only/*.js (invariants with no node reference). No result file is committed.",
+      "use_in_your_work": "Drop the cases into your own engine's CI as a differential test against node.",
+      "honest_limits": "Needs the release binary at target/release/omni-render and an npm-installed acorn; marked external because it needs a cargo build.",
+      "corrections": []
+    },
+    {
+      "id": "R13",
+      "title": "Rust unit tests (x86 emitter, ternary, cookies, net, paint, css, page, jsi)",
+      "claim": "cargo test --release runs the unit tests in the default (permissive-code-only) build",
+      "kind": "external",
+      "verify": "cargo test --release 2>&1 | grep -E '^test result'",
+      "expect": "test result: ok",
+      "evidence": [
+        "README.md",
+        "src/jit/x86.rs",
+        "src/jit/ternary.rs",
+        "src/cookie.rs",
+        "src/jsi.rs"
+      ],
+      "runtime_s": 900,
+      "needs": [
+        "cargo (Rust 1.8x, edition 2024)",
+        "a C toolchain"
+      ],
+      "cpu_flags": [],
+      "what_it_means": "The unit tests sit beside the code in src (the x86 emitter, the ternary kernel, the cookie jar, networking, paint, CSS, page and the JS interpreter). Passing proves those functions behave as their tests expect in the default MIT OR Apache-2.0 build. It is a small set relative to the engine, so it does not stand in for the corpus measurements.",
+      "how_we_got_it": "README.md ('cargo test --release  # unit tests (default build)'). No test log is committed; there is no recorded run time.",
+      "use_in_your_work": "Quick regression check after you change the engine or port parts of it.",
+      "honest_limits": "Needs a full release build, so it was not run in the suite-check; the doctor and T25 code are only built with --features t25 and are not covered by the default test run.",
+      "corrections": []
+    }
+  ]
+}

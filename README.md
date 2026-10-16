@@ -1,5 +1,11 @@
 # omni-render
 
+<!-- status-badges (REPO-ACCESS-C) -->
+[![status: pre-alpha (under development)](https://img.shields.io/badge/status-pre--alpha%20%28under%20development%29-orange)](STATUS.md) **Status: pre-alpha, under development** — what works today, what is untested and what failed: [`STATUS.md`](STATUS.md)
+
+[![defensive publication: DOI 10.5281/zenodo.23282731](https://img.shields.io/badge/defensive%20publication-DOI%2010.5281%2Fzenodo.23282731-blue)](https://doi.org/10.5281/zenodo.23282731) **Defensive publication:** [`TECHNICAL-DISCLOSURE.md`](TECHNICAL-DISCLOSURE.md) · DOI [10.5281/zenodo.23282731](https://doi.org/10.5281/zenodo.23282731)
+<!-- /status-badges -->
+
 A web rendering engine for the computers people already own: speed across the whole experience, small memory, safety and privacy.
 Packed DOM (16 bytes per node, 3.9x less RAM than an `Rc` DOM over html5ever on the bench corpus), own CSS engine, integer fixed-point
 layout (1/64 px), 2-bit glyph masks, a JavaScript runtime that compiles to its own IR, and a self-repair ("doctor") core for layout.

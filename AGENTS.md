@@ -2,8 +2,10 @@
 
 For coding assistants (and people) setting this repository up. Plain steps; every command runs from the repo root.
 
+**Status: pre-alpha, under development.** Interfaces, numbers and file layout can change without notice. Read `STATUS.md` first: what works today (each line names its test and evidence file), what is not yet tested, the known failures and the corrections.
+
 ## What it is
-A web rendering engine for the computers people already own: speed across the whole experience, small memory, safety and privacy. Packed DOM (16 bytes per node, 3.9x less RAM than an `Rc` DOM over html5ever on the bench corpus), own CSS engine, integer fixed-point layout (1/64 px), 2-bit glyph masks, a JavaScript runtime that compiles to its own IR, and a self-repair ("doctor") core for layout. Licence: MIT OR Apache-2.0 for the renderer; the doctor and T25 core are PolyForm Small Business 1.0.0 OR PolyForm Noncommercial 1.0.0 and are built only with `--features t25` (`LICENSING.md`). …
+Our own web rendering engine in Rust: packed DOM, own CSS engine, integer layout, 2-bit raster, a program runtime that emits x86, a JavaScript interpreter on its own IR, and a self-repair core for layout.
 
 ## Install and check (3 commands)
 ```bash
@@ -12,10 +14,11 @@ git clone --depth 1 https://github.com/SovRing-Labs/omni-render && cd omni-rende
 cargo test --release   # expect: test result: ok
 ```
 Needs: cargo.
+Whole suite instead: `bash install.sh --no-gui` (python check → venv → every runnable `suite.json` test, headless; without `--no-gui` it then opens the local results page on 127.0.0.1).
 Note: a full Rust release build first (several minutes of CPU).
 
 ## What the tests mean
-`suite.json` lists every claim this repository makes with its verify command, the expected output, what passing means, how the number was obtained and how to use it in your own work (being written). `STATUS.md` says what works today, what is not yet tested and the known failures; the umbrella's `STATUS.md` has one row per repository.
+`suite.json` lists every claim this repository makes with its verify command, the expected output, what passing means, how the number was obtained and how to use it in your own work (13 tests, in `suite.json` at the repository root). `STATUS.md` says what works today, what is not yet tested and the known failures; the umbrella's `STATUS.md` has one row per repository.
 
 ## Where the evidence is
 - `DOSSIER.md` — history, metrics and limits
