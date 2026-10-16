@@ -1,0 +1,20 @@
+# omni-render
+
+> A web rendering engine for the computers people already own: speed across the whole experience, small memory, safety and privacy.
+
+Setup: `git clone --depth 1 https://github.com/SovRing-Labs/omni-render && cd omni-render && cargo test --release` (expect: test result: ok).
+Licence: MIT OR Apache-2.0 (renderer); doctor and T25 core PolyForm Small Business OR Noncommercial.
+
+## Docs
+- [README.md](https://raw.githubusercontent.com/SovRing-Labs/omni-render/main/README.md)
+- [DOSSIER.md](https://raw.githubusercontent.com/SovRing-Labs/omni-render/main/DOSSIER.md)
+- [TECHNICAL-DISCLOSURE.md](https://raw.githubusercontent.com/SovRing-Labs/omni-render/main/TECHNICAL-DISCLOSURE.md)
+- [PROVENANCE.md](https://raw.githubusercontent.com/SovRing-Labs/omni-render/main/PROVENANCE.md)
+- [LICENSING.md](https://raw.githubusercontent.com/SovRing-Labs/omni-render/main/LICENSING.md)
+- [CITATION.cff](https://raw.githubusercontent.com/SovRing-Labs/omni-render/main/CITATION.cff)
+- [AGENTS.md](https://raw.githubusercontent.com/SovRing-Labs/omni-render/main/AGENTS.md)
+- [STATUS.md](https://raw.githubusercontent.com/SovRing-Labs/omni-render/main/STATUS.md)
+- [suite.json](https://raw.githubusercontent.com/SovRing-Labs/omni-render/main/suite.json)
+
+## Optional
+- [SovRing umbrella (all repos, MCP setup)](https://github.com/SovRing-Labs/SovRing)
